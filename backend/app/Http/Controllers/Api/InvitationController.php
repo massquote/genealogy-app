@@ -8,15 +8,17 @@ use App\Http\Resources\InvitationResource;
 use App\Mail\InvitationMail;
 use App\Models\Invitation;
 use App\Models\Person;
+use App\Services\UserMailerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class InvitationController extends Controller
 {
+    public function __construct(private readonly UserMailerService $userMailer) {}
+
     /**
      * List invitations the current user sent + invitations addressed to their email.
      */
@@ -64,7 +66,12 @@ class InvitationController extends Controller
             'token' => Invitation::generateToken(),
         ]);
 
-        Mail::to($invitation->email)->send(new InvitationMail($invitation, $user));
+        // Use the inviter's configured email integration (Resend) if enabled,
+        // else fall back to the application default mailer (Mailpit in dev).
+        $this->userMailer
+            ->mailerFor($user)
+            ->to($invitation->email)
+            ->send(new InvitationMail($invitation, $user));
 
         return response()->json([
             'data' => new InvitationResource($invitation->load('person')),

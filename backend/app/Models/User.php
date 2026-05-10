@@ -50,4 +50,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Invitation::class, 'invited_by_user_id');
     }
+
+    /** Third-party integrations this user has configured. */
+    public function integrations(): HasMany
+    {
+        return $this->hasMany(Integration::class);
+    }
+
+    /** Convenience: this user's email integration (if any). */
+    public function emailIntegration(): HasOne
+    {
+        return $this->hasOne(Integration::class)->where('type', Integration::TYPE_EMAIL);
+    }
 }

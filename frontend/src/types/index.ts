@@ -57,7 +57,6 @@ export interface Invitation {
   person?: Person;
 }
 
-/** Friendly relation labels for the UI -> backend mapping. */
 export type FriendlyRelation =
   | 'father'
   | 'mother'
@@ -66,3 +65,18 @@ export type FriendlyRelation =
   | 'daughter'
   | 'child'
   | 'spouse';
+
+export type IntegrationType = 'email';
+export type IntegrationProvider = 'resend';
+
+export interface Integration {
+  id: number;
+  type: IntegrationType;
+  provider: IntegrationProvider;
+  is_enabled: boolean;
+  has_api_key: boolean;
+  api_key_masked: string | null;
+  from_address: string | null;
+  last_used_at: string | null;
+  updated_at: string | null;
+}

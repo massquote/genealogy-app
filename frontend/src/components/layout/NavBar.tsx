@@ -83,6 +83,9 @@ export function NavBar() {
               <DropdownItem to="/profile/edit" icon={<span>⚙️</span>}>
                 Account settings
               </DropdownItem>
+              <DropdownItem to="/integrations" icon={<span>🔌</span>}>
+                Integrations
+              </DropdownItem>
               <DropdownDivider />
               <DropdownItem onClick={handleLogout} tone="danger" icon={<span>↩</span>}>
                 Sign out

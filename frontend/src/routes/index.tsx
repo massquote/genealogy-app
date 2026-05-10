@@ -14,6 +14,7 @@ import { EditPersonPage } from '@/pages/EditPersonPage';
 import { InvitationsPage } from '@/pages/InvitationsPage';
 import { ClaimInvitationPage } from '@/pages/ClaimInvitationPage';
 import { FamilyTreePage } from '@/pages/FamilyTreePage';
+import { IntegrationsPage } from '@/pages/IntegrationsPage';
 
 export const router = createBrowserRouter([
   // Public + general layout
@@ -54,6 +55,7 @@ export const router = createBrowserRouter([
           { path: '/people/:id/edit', element: <EditPersonPage /> },
           { path: '/invitations', element: <InvitationsPage /> },
           { path: '/tree', element: <FamilyTreePage /> },
+          { path: '/integrations', element: <IntegrationsPage /> },
         ],
       },
     ],

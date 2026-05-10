@@ -5,6 +5,7 @@ export { Select, type SelectProps, type SelectOption } from './Select';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Modal, type ModalProps } from './Modal';
 export { Avatar, type AvatarProps } from './Avatar';
+export { Toggle, type ToggleProps } from './Toggle';
 export {
   DropdownMenu,
   DropdownItem,

@@ -44,5 +44,17 @@ Route::prefix('v1')->group(function () {
             ->name('invitations.store');
         Route::post('/invitations/{token}/accept', [\App\Http\Controllers\Api\InvitationController::class, 'accept'])
             ->name('invitations.accept');
+
+        // --- Per-user 3rd party integrations ---
+        Route::get('/integrations', [\App\Http\Controllers\Api\IntegrationController::class, 'index'])
+            ->name('integrations.index');
+        Route::put('/integrations/email', [\App\Http\Controllers\Api\IntegrationController::class, 'upsertEmail'])
+            ->name('integrations.email.upsert');
+        Route::patch('/integrations/email/toggle', [\App\Http\Controllers\Api\IntegrationController::class, 'toggleEmail'])
+            ->name('integrations.email.toggle');
+        Route::delete('/integrations/email', [\App\Http\Controllers\Api\IntegrationController::class, 'destroyEmail'])
+            ->name('integrations.email.destroy');
+        Route::post('/integrations/email/test', [\App\Http\Controllers\Api\IntegrationController::class, 'testEmail'])
+            ->name('integrations.email.test');
     });
 });
