@@ -115,8 +115,8 @@ export function FamilyTreePage() {
             orientation="vertical"
             pathFunc="step"
             renderCustomNodeElement={(props) => <FamilyTreeNode {...props} />}
-            separation={{ siblings: 1.5, nonSiblings: 2 }}
-            nodeSize={{ x: 220, y: 140 }}
+            separation={{ siblings: 1.4, nonSiblings: 1.8 }}
+            nodeSize={{ x: 240, y: 150 }}
             zoomable
             collapsible={false}
           />
