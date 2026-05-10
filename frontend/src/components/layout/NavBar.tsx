@@ -86,6 +86,9 @@ export function NavBar() {
               <DropdownItem to="/integrations" icon={<span>🔌</span>}>
                 Integrations
               </DropdownItem>
+              <DropdownItem to="/help" icon={<span>❓</span>}>
+                Help &amp; guide
+              </DropdownItem>
               <DropdownDivider />
               <DropdownItem onClick={handleLogout} tone="danger" icon={<span>↩</span>}>
                 Sign out

@@ -15,6 +15,7 @@ import { InvitationsPage } from '@/pages/InvitationsPage';
 import { ClaimInvitationPage } from '@/pages/ClaimInvitationPage';
 import { FamilyTreePage } from '@/pages/FamilyTreePage';
 import { IntegrationsPage } from '@/pages/IntegrationsPage';
+import { HelpPage } from '@/pages/HelpPage';
 
 export const router = createBrowserRouter([
   // Public + general layout
@@ -56,6 +57,7 @@ export const router = createBrowserRouter([
           { path: '/invitations', element: <InvitationsPage /> },
           { path: '/tree', element: <FamilyTreePage /> },
           { path: '/integrations', element: <IntegrationsPage /> },
+          { path: '/help', element: <HelpPage /> },
         ],
       },
     ],
