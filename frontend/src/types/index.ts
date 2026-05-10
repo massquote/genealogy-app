@@ -34,3 +34,35 @@ export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
 }
+
+export type RelationshipType = 'parent' | 'spouse';
+
+export interface Relationship {
+  id: number;
+  person_a_id: number;
+  person_b_id: number;
+  type: RelationshipType;
+  created_by_user_id: number;
+}
+
+export interface Invitation {
+  id: number;
+  person_id: number;
+  email: string;
+  token: string;
+  is_accepted: boolean;
+  accepted_at: string | null;
+  invited_by_user_id: number;
+  created_at: string;
+  person?: Person;
+}
+
+/** Friendly relation labels for the UI -> backend mapping. */
+export type FriendlyRelation =
+  | 'father'
+  | 'mother'
+  | 'parent'
+  | 'son'
+  | 'daughter'
+  | 'child'
+  | 'spouse';

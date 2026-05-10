@@ -7,6 +7,11 @@ import { NotFoundPage } from '@/pages/NotFoundPage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { MyProfilePage } from '@/pages/MyProfilePage';
+import { EditProfilePage } from '@/pages/EditProfilePage';
+import { AddRelativePage } from '@/pages/AddRelativePage';
+import { PersonDetailPage } from '@/pages/PersonDetailPage';
+import { EditPersonPage } from '@/pages/EditPersonPage';
+import { InvitationsPage } from '@/pages/InvitationsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 
 export const router = createBrowserRouter([
@@ -39,16 +44,18 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: '/profile', element: <MyProfilePage /> },
+          { path: '/profile/edit', element: <EditProfilePage /> },
+          { path: '/relatives/new', element: <AddRelativePage /> },
+          { path: '/people/:id', element: <PersonDetailPage /> },
+          { path: '/people/:id/edit', element: <EditPersonPage /> },
+          { path: '/invitations', element: <InvitationsPage /> },
           {
             path: '/tree',
             element: (
-              <PlaceholderPage title="Family Tree" comingIn="Tree visualization arrives in Session 5." />
-            ),
-          },
-          {
-            path: '/invitations',
-            element: (
-              <PlaceholderPage title="Invitations" comingIn="Invitation workflow arrives in Session 5." />
+              <PlaceholderPage
+                title="Family Tree visualization"
+                comingIn="Interactive tree view arrives in Session 5."
+              />
             ),
           },
         ],

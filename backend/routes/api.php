@@ -29,6 +29,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         });
 
+        Route::get('/tree', [\App\Http\Controllers\Api\TreeController::class, 'index'])
+            ->name('tree.index');
         Route::apiResource('people', \App\Http\Controllers\Api\PersonController::class);
 
         Route::post('/relationships', [\App\Http\Controllers\Api\RelationshipController::class, 'store'])
