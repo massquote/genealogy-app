@@ -14,6 +14,7 @@ import {
   useUpsertEmailIntegration,
 } from '@/hooks/useIntegrations';
 import { applyServerErrors } from '@/lib/apiErrors';
+import { PushIntegrationCard } from '@/components/feature/PushIntegrationCard';
 
 const schema = z.object({
   api_key: z
@@ -218,11 +219,13 @@ export function IntegrationsPage() {
         <BehaviourPanel isEnabled={integration?.is_enabled ?? false} hasKey={integration?.has_api_key ?? false} />
       </Card>
 
+      <PushIntegrationCard />
+
       <Card padding="lg" className="border-dashed bg-slate-50">
         <CardTitle className="text-slate-700">More integrations coming…</CardTitle>
         <CardDescription>
-          The architecture supports adding push notifications, calendar sync, image storage, and more.
-          Email is the first of many.
+          The architecture supports adding calendar sync, image storage, Slack, and more.
+          Email and push notifications are the first of many.
         </CardDescription>
       </Card>
     </div>

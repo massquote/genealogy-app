@@ -22,6 +22,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/invitations/{token}', [\App\Http\Controllers\Api\InvitationController::class, 'lookup'])
         ->name('invitations.lookup');
 
+    // --- Public Web Push public key ---
+    Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'vapidPublicKey'])
+        ->name('push.vapid');
+
     // --- Authenticated routes ---
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('auth')->group(function () {
@@ -56,5 +60,15 @@ Route::prefix('v1')->group(function () {
             ->name('integrations.email.destroy');
         Route::post('/integrations/email/test', [\App\Http\Controllers\Api\IntegrationController::class, 'testEmail'])
             ->name('integrations.email.test');
+
+        // --- Web Push subscriptions ---
+        Route::get('/push/subscriptions', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'index'])
+            ->name('push.subscriptions.index');
+        Route::post('/push/subscriptions', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'store'])
+            ->name('push.subscriptions.store');
+        Route::delete('/push/subscriptions/{subscription}', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'destroy'])
+            ->name('push.subscriptions.destroy');
+        Route::post('/push/test', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'test'])
+            ->name('push.test');
     });
 });

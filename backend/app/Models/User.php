@@ -62,4 +62,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Integration::class)->where('type', Integration::TYPE_EMAIL);
     }
+
+    /** Web Push subscriptions across the user's browsers/devices. */
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
 }

@@ -24,6 +24,20 @@ if ! grep -q "^APP_KEY=base64" .env; then
     php artisan key:generate --no-interaction --force
 fi
 
+# Generate VAPID key pair on first boot for Web Push, if missing.
+if ! grep -q "^VAPID_PUBLIC_KEY=." .env; then
+    echo "[entrypoint] Generating VAPID key pair for Web Push"
+    KEYS=$(php -r "require 'vendor/autoload.php'; \$k = \\Minishlink\\WebPush\\VAPID::createVapidKeys(); echo \$k['publicKey'].'|'.\$k['privateKey'];")
+    PUB=$(echo "$KEYS" | cut -d'|' -f1)
+    PRIV=$(echo "$KEYS" | cut -d'|' -f2)
+    if grep -q "^VAPID_PUBLIC_KEY=" .env; then
+        sed -i "s|^VAPID_PUBLIC_KEY=.*|VAPID_PUBLIC_KEY=$PUB|" .env
+        sed -i "s|^VAPID_PRIVATE_KEY=.*|VAPID_PRIVATE_KEY=$PRIV|" .env
+    else
+        printf "\n# --- Web Push / VAPID (auto-generated) ---\nVAPID_SUBJECT=\"mailto:no-reply@familyknot.test\"\nVAPID_PUBLIC_KEY=%s\nVAPID_PRIVATE_KEY=%s\n" "$PUB" "$PRIV" >> .env
+    fi
+fi
+
 # Wait for MySQL (defensive — depends_on with healthcheck should handle this)
 echo "[entrypoint] Waiting for MySQL..."
 ATTEMPTS=0
