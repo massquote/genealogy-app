@@ -1,0 +1,88 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: familyknot-mysql
+    restart: unless-stopped
+    ports:
+      - "19306:3306"
+    environment:
+      MYSQL_DATABASE: familyknot
+      MYSQL_USER: familyknot
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    volumes:
+      - familyknot_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-prootsecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [familyknot]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: familyknot-mailpit
+    restart: unless-stopped
+    ports:
+      - "19025:8025"
+      - "19125:1025"
+    networks: [familyknot]
+
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: familyknot-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: familyknot
+      DB_USERNAME: familyknot
+      DB_PASSWORD: secret
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+    networks: [familyknot]
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: familyknot-nginx
+    restart: unless-stopped
+    ports:
+      - "19000:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks: [familyknot]
+
+  frontend:
+    image: node:20-alpine
+    container_name: familyknot-frontend
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "19173:5173"
+    volumes:
+      - ./frontend:/app
+      - familyknot_frontend_node_modules:/app/node_modules
+    command: sh -c "npm install --no-fund --no-audit && npm run dev -- --host 0.0.0.0 --port 5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    networks: [familyknot]
+
+volumes:
+  familyknot_mysql_data:
+  familyknot_frontend_node_modules:
+
+networks:
+  familyknot:
+    name: familyknot_network
+    driver: bridge
