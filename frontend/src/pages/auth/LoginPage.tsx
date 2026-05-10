@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +19,7 @@ type FormValues = z.infer<typeof schema>;
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const login = useLogin();
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -29,18 +30,25 @@ export function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
-  const from = (location.state as { from?: string } | null)?.from ?? '/profile';
+  const redirectTo =
+    searchParams.get('redirectTo') ??
+    (location.state as { from?: string } | null)?.from ??
+    '/profile';
 
   const onSubmit = async (values: FormValues) => {
     setFormError(null);
     try {
       await login.mutateAsync(values);
-      navigate(from, { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       const message = applyServerErrors<FormValues>(err, setError);
       if (message) setFormError(message);
     }
   };
+
+  const registerHref = searchParams.get('redirectTo')
+    ? `/register?redirectTo=${encodeURIComponent(searchParams.get('redirectTo')!)}`
+    : '/register';
 
   return (
     <Card padding="lg">
@@ -74,7 +82,7 @@ export function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         New here?{' '}
-        <Link to="/register" className="font-medium text-brand-700 hover:underline">
+        <Link to={registerHref} className="font-medium text-brand-700 hover:underline">
           Create an account
         </Link>
       </p>

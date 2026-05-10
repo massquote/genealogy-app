@@ -12,14 +12,18 @@ import { AddRelativePage } from '@/pages/AddRelativePage';
 import { PersonDetailPage } from '@/pages/PersonDetailPage';
 import { EditPersonPage } from '@/pages/EditPersonPage';
 import { InvitationsPage } from '@/pages/InvitationsPage';
-import { PlaceholderPage } from '@/pages/PlaceholderPage';
+import { ClaimInvitationPage } from '@/pages/ClaimInvitationPage';
+import { FamilyTreePage } from '@/pages/FamilyTreePage';
 
 export const router = createBrowserRouter([
   // Public + general layout
   {
     path: '/',
     element: <AppLayout />,
-    children: [{ index: true, element: <HomePage /> }],
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: 'claim/:token', element: <ClaimInvitationPage /> },
+    ],
   },
 
   // Auth-only routes (redirect away if already signed in)
@@ -49,15 +53,7 @@ export const router = createBrowserRouter([
           { path: '/people/:id', element: <PersonDetailPage /> },
           { path: '/people/:id/edit', element: <EditPersonPage /> },
           { path: '/invitations', element: <InvitationsPage /> },
-          {
-            path: '/tree',
-            element: (
-              <PlaceholderPage
-                title="Family Tree visualization"
-                comingIn="Interactive tree view arrives in Session 5."
-              />
-            ),
-          },
+          { path: '/tree', element: <FamilyTreePage /> },
         ],
       },
     ],

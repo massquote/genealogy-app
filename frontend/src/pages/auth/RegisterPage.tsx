@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,8 +37,12 @@ const genderOptions = [
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const registerMutation = useRegister();
   const [formError, setFormError] = useState<string | null>(null);
+
+  const redirectTo = searchParams.get('redirectTo') ?? '/profile';
+  const prefillEmail = searchParams.get('email') ?? '';
 
   const {
     register,
@@ -47,7 +51,7 @@ export function RegisterPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { gender: 'unknown' },
+    defaultValues: { gender: 'unknown', email: prefillEmail },
   });
 
   const onSubmit = async (values: FormValues) => {
@@ -59,12 +63,16 @@ export function RegisterPage() {
         date_of_birth: values.date_of_birth || undefined,
       };
       await registerMutation.mutateAsync(payload);
-      navigate('/profile', { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       const message = applyServerErrors<FormValues>(err, setError);
       if (message) setFormError(message);
     }
   };
+
+  const loginHref = searchParams.get('redirectTo')
+    ? `/login?redirectTo=${encodeURIComponent(searchParams.get('redirectTo')!)}`
+    : '/login';
 
   return (
     <Card padding="lg">
@@ -115,6 +123,8 @@ export function RegisterPage() {
           autoComplete="email"
           {...register('email')}
           error={errors.email?.message}
+          readOnly={Boolean(prefillEmail)}
+          helpText={prefillEmail ? 'Pre-filled from your invitation' : undefined}
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -145,7 +155,7 @@ export function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-brand-700 hover:underline">
+        <Link to={loginHref} className="font-medium text-brand-700 hover:underline">
           Sign in
         </Link>
       </p>
