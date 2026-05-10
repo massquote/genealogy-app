@@ -1,6 +1,13 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/cn';
 import { Button } from '@/components/ui/Button';
+import { Avatar } from '@/components/ui/Avatar';
+import {
+  DropdownMenu,
+  DropdownItem,
+  DropdownDivider,
+  DropdownLabel,
+} from '@/components/ui/DropdownMenu';
 import { useAuth, useLogout } from '@/hooks/useAuth';
 
 interface NavItem {
@@ -52,14 +59,35 @@ export function NavBar() {
             ))}
 
           {isAuthenticated ? (
-            <>
-              <span className="hidden px-3 text-sm text-slate-500 sm:inline">
-                {user?.name}
-              </span>
-              <Button variant="ghost" size="sm" onClick={handleLogout} isLoading={logout.isPending}>
+            <DropdownMenu
+              className="ml-2"
+              trigger={
+                <button
+                  type="button"
+                  aria-label="Open account menu"
+                  className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                >
+                  <Avatar name={user?.name} size="md" />
+                </button>
+              }
+            >
+              <DropdownLabel>Signed in as</DropdownLabel>
+              <div className="px-4 pb-2 text-sm text-slate-700">
+                <p className="truncate font-medium">{user?.name}</p>
+                <p className="truncate text-xs text-slate-500">{user?.email}</p>
+              </div>
+              <DropdownDivider />
+              <DropdownItem to="/profile" icon={<span>👤</span>}>
+                My profile
+              </DropdownItem>
+              <DropdownItem to="/profile/edit" icon={<span>⚙️</span>}>
+                Account settings
+              </DropdownItem>
+              <DropdownDivider />
+              <DropdownItem onClick={handleLogout} tone="danger" icon={<span>↩</span>}>
                 Sign out
-              </Button>
-            </>
+              </DropdownItem>
+            </DropdownMenu>
           ) : (
             <>
               <Link to="/login">
