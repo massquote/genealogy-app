@@ -22,13 +22,19 @@ self.addEventListener('push', (event) => {
     }
   }
 
+  // Use a unique tag per push so repeat tests definitely re-trigger
+  // a system notification instead of being silently deduped.
+  const tag = payload.tag ?? `familyknot-${Date.now()}`;
+
   const options = {
     body: payload.body,
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/favicon.svg',
+    badge: '/favicon.svg',
     data: { url: payload.url || '/' },
-    tag: payload.tag || 'familyknot-notification',
-    renotify: false,
+    tag,
+    renotify: true,
+    requireInteraction: false,
+    vibrate: [100, 50, 100],
   };
 
   event.waitUntil(self.registration.showNotification(payload.title, options));
