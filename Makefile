@@ -60,6 +60,9 @@ key:          ## Generate a new APP_KEY
 tinker:       ## Open Laravel Tinker REPL
 	docker compose exec app php artisan tinker
 
+fix-perms:    ## Reset ownership of backend files to host user (after artisan make:)
+	docker compose exec app chown -R 1000:1000 /var/www/html
+
 # --- Tests ---
 .PHONY: test test-back test-front
 

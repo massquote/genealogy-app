@@ -29,5 +29,11 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_HOST" value="mysql"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_DATABASE" value="familyknot_testing"/>
+        <env name="DB_USERNAME" value="familyknot"/>
+        <env name="DB_PASSWORD" value="secret"/>
     </php>
 </phpunit>
