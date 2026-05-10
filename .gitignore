@@ -13,6 +13,7 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.docker
+!.env.testing
 
 # Backend (Laravel)
 backend/vendor/
