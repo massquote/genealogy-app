@@ -46,6 +46,7 @@ services:
       DB_DATABASE: familyknot
       DB_USERNAME: familyknot
       DB_PASSWORD: secret
+      DB_ROOT_PASSWORD: rootsecret
       MAIL_HOST: mailpit
       MAIL_PORT: 1025
     networks: [familyknot]

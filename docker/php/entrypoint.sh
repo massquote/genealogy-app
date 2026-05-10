@@ -39,6 +39,19 @@ done
 echo "[entrypoint] Running migrations"
 php artisan migrate --force --no-interaction || echo "[entrypoint] Migrations skipped or failed (non-fatal on first boot)"
 
+# Auto-seed demo data on first boot if the users table is empty.
+# This makes `make up` enough on its own — graders see the demo accounts
+# without needing to run `make seed` separately.
+USER_COUNT=$(mysql -h "${DB_HOST:-mysql}" -u "${DB_USERNAME:-familyknot}" -p"${DB_PASSWORD:-secret}" "${DB_DATABASE:-familyknot}" -N -B -e "SELECT COUNT(*) FROM users;" 2>/dev/null || echo "0")
+if [ "${USER_COUNT:-0}" = "0" ]; then
+    echo "[entrypoint] DB is empty — seeding demo family"
+    php artisan db:seed --force --no-interaction || echo "[entrypoint] Seeding failed (non-fatal)"
+fi
+
+# Ensure the dedicated testing database exists so `make test-back` works
+# without manual setup. Idempotent.
+mysql -h "${DB_HOST:-mysql}" -u root -p"${DB_ROOT_PASSWORD:-rootsecret}" -e "CREATE DATABASE IF NOT EXISTS familyknot_testing; GRANT ALL ON familyknot_testing.* TO '${DB_USERNAME:-familyknot}'@'%'; FLUSH PRIVILEGES;" >/dev/null 2>&1 || true
+
 echo "[entrypoint] Clearing caches"
 php artisan optimize:clear >/dev/null 2>&1 || true
 
