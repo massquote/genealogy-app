@@ -14,8 +14,10 @@ Built for the **Full Stack Developer Exam** — Laravel 11 + React 18 + Docker.
 git clone git@github.com:massquote/genealogy-app.git familyknot
 cd familyknot
 make up         # first boot pulls images + installs deps inside containers (~3–5 min)
-make seed       # load the demo family
+                # auto-seeds the demo family on first boot if the DB is empty
 ```
+
+> Want a guided 5-minute tour? See **[DEMO.md](./DEMO.md)**.
 
 That's it. Open:
 
@@ -25,7 +27,7 @@ That's it. Open:
 | <http://localhost:19000/api/v1/health> | Backend health check |
 | <http://localhost:19025> | Mailpit — see emails the app sends |
 
-**Demo accounts** (after `make seed`):
+**Demo accounts** (auto-seeded on first boot):
 
 | Email | Password | Tree |
 |---|---|---|
