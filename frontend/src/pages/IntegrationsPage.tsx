@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/Button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/Card';
+import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
+import { StatusBadge, type StatusBadgeTone } from '@/components/ui/StatusBadge';
 import { TextField } from '@/components/ui/TextField';
 import { Toggle } from '@/components/ui/Toggle';
 import {
@@ -27,6 +29,32 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+function emailStatus(integration: { has_api_key: boolean; is_enabled: boolean } | null): {
+  tone: StatusBadgeTone;
+  label: string;
+  subtitle: string;
+} {
+  if (!integration?.has_api_key) {
+    return {
+      tone: 'slate',
+      label: 'Not configured',
+      subtitle: 'Add a Resend API key to send real invitation emails.',
+    };
+  }
+  if (!integration.is_enabled) {
+    return {
+      tone: 'amber',
+      label: 'Disabled',
+      subtitle: 'Falls back to Mailpit until re-enabled.',
+    };
+  }
+  return {
+    tone: 'green',
+    label: 'Active',
+    subtitle: 'Invitations are being sent through Resend.',
+  };
+}
+
 export function IntegrationsPage() {
   const { integration, isLoading } = useEmailIntegration();
   const upsert = useUpsertEmailIntegration();
@@ -48,13 +76,9 @@ export function IntegrationsPage() {
     defaultValues: { api_key: '', from_address: '' },
   });
 
-  // Pre-fill the from-address (we never see the real key, only the masked one)
   useEffect(() => {
     if (integration) {
-      reset({
-        api_key: '',
-        from_address: integration.from_address ?? '',
-      });
+      reset({ api_key: '', from_address: integration.from_address ?? '' });
     }
   }, [integration, reset]);
 
@@ -75,7 +99,9 @@ export function IntegrationsPage() {
     }
   };
 
-  const handleToggle = async () => {
+  const handleToggle = async (e?: React.MouseEvent) => {
+    // Prevent the click from collapsing/expanding the card
+    e?.stopPropagation();
     setSuccessMsg(null);
     setTestResult(null);
     await toggle.mutateAsync();
@@ -95,61 +121,61 @@ export function IntegrationsPage() {
       setTestResult({ ok: true, msg: res.message });
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } }; message?: string };
-      setTestResult({
-        ok: false,
-        msg: e.response?.data?.message ?? e.message ?? 'Test failed',
-      });
+      setTestResult({ ok: false, msg: e.response?.data?.message ?? e.message ?? 'Test failed' });
     }
   };
 
+  const status = emailStatus(integration);
+  const startOpen = !integration?.has_api_key;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <header>
         <h1 className="text-3xl font-bold text-slate-900">Integrations</h1>
         <p className="mt-1 text-slate-600">
-          Connect FamilyKnot to third-party services. Each integration is private to your account.
+          Connect FamilyKnot to third-party services. Click any card to expand.
         </p>
       </header>
 
-      <Card padding="lg">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle>📧 Email — Resend</CardTitle>
-            <CardDescription>
-              Send real invitation emails through{' '}
-              <a
-                href="https://resend.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-brand-700 hover:underline"
-              >
-                Resend
-              </a>
-              . Get an API key at{' '}
-              <code className="rounded bg-slate-100 px-1 text-xs">resend.com/api-keys</code>.
-            </CardDescription>
+      <CollapsibleCard
+        defaultOpen={startOpen}
+        title={<span>📧 Email — Resend</span>}
+        subtitle={status.subtitle}
+        status={
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+            {integration?.has_api_key && (
+              <Toggle
+                checked={integration.is_enabled}
+                onChange={() => handleToggle()}
+                ariaLabel="Toggle email integration"
+              />
+            )}
           </div>
-          {integration?.has_api_key && (
-            <Toggle
-              checked={integration.is_enabled}
-              onChange={handleToggle}
-              ariaLabel="Toggle email integration"
-            />
-          )}
-        </div>
+        }
+      >
+        <CardDescription>
+          Send real invitation emails through{' '}
+          <a
+            href="https://resend.com"
+            target="_blank"
+            rel="noreferrer"
+            className="text-brand-700 hover:underline"
+          >
+            Resend
+          </a>
+          . Get an API key at{' '}
+          <code className="rounded bg-slate-100 px-1 text-xs">resend.com/api-keys</code>.
+        </CardDescription>
 
         {isLoading ? (
           <p className="mt-6 text-slate-500">Loading…</p>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-4">
             <TextField
               label="API key"
               type="password"
-              placeholder={
-                integration?.has_api_key
-                  ? `Saved: ${integration.api_key_masked}`
-                  : 're_…'
-              }
+              placeholder={integration?.has_api_key ? `Saved: ${integration.api_key_masked}` : 're_…'}
               autoComplete="off"
               {...register('api_key')}
               error={errors.api_key?.message}
@@ -169,9 +195,7 @@ export function IntegrationsPage() {
               helpText="Must be on a domain you've verified in Resend (or use onboarding@resend.dev for testing)."
             />
 
-            {formError && (
-              <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>
-            )}
+            {formError && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
             {successMsg && (
               <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMsg}</p>
             )}
@@ -190,12 +214,7 @@ export function IntegrationsPage() {
             <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
               {integration?.has_api_key && (
                 <>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={handleDelete}
-                    isLoading={remove.isPending}
-                  >
+                  <Button type="button" variant="ghost" onClick={handleDelete} isLoading={remove.isPending}>
                     Disconnect
                   </Button>
                   <Button
@@ -216,8 +235,11 @@ export function IntegrationsPage() {
           </form>
         )}
 
-        <BehaviourPanel isEnabled={integration?.is_enabled ?? false} hasKey={integration?.has_api_key ?? false} />
-      </Card>
+        <BehaviourPanel
+          isEnabled={integration?.is_enabled ?? false}
+          hasKey={integration?.has_api_key ?? false}
+        />
+      </CollapsibleCard>
 
       <PushIntegrationCard />
 

@@ -6,6 +6,8 @@ export { Textarea, type TextareaProps } from './Textarea';
 export { Modal, type ModalProps } from './Modal';
 export { Avatar, type AvatarProps } from './Avatar';
 export { Toggle, type ToggleProps } from './Toggle';
+export { CollapsibleCard, type CollapsibleCardProps } from './CollapsibleCard';
+export { StatusBadge, type StatusBadgeProps, type StatusBadgeTone } from './StatusBadge';
 export {
   DropdownMenu,
   DropdownItem,
